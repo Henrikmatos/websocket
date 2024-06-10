@@ -1,0 +1,26 @@
+version: "3.7"
+
+websocket:
+    build: .
+    image: my-websocket-server:latest
+    ports:
+      - "8080:8080"
+    networks:
+      - traefik-proxy
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.websocket.rule=Host(`websocket.gpscrypto.xyz`)"
+        - "traefik.http.services.websocket.loadbalancer.server.port=8080"
+        - "traefik.http.routers.websocket.tls.certresolver=letsencryptresolver"
+        - "traefik.http.routers.websocket.service=websocket"
+        - "traefik.docker.network=traefik-proxy"
+        - "traefik.http.routers.websocket.entrypoints=websecure"
+        - "traefik.http.routers.websocket.priority=1"
+
+networks:
+  traefik-proxy:
+    external: true
+    attachable: true
+    name: traefik-proxy
